@@ -7,7 +7,7 @@ Analysis nTuple for HMT trigger studies. This repository can do the following:
  - Run CA4 clustering on HMT hits
  - Save emulated/L1 LCT hits
  - Run standard muon reco [experimental]
- - `SimpleCSCshowerFilter` builds HMT tree to contain the above 
+ - `SimpleCSCshowerFilter` builds HMT tree to contain the above
 
 ## Setup
 
@@ -34,6 +34,12 @@ On lxplus, one can submit condor jobs with:
 More example commands in `./test/run.sh`
 
 To submit jobs on CRAB:
+
+Load crab3 library
+```
+source /cvmfs/cms.cern.ch/crab3/crab.sh
+```
+The following command is to check crab configuration before submitting. If no issue has been observed, please remove `--dryrun` option at the end.
 ```
 python3 crab_multi_dataset.py -p [pset.py] -o [eos/path/to/save/outputs] -t [tag:str] -i [input text file] --send-external -s [job splitting] -n [unit per job] --work-area [crab directory] --dryrun
 ```
