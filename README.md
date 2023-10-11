@@ -38,3 +38,5 @@ To submit jobs on CRAB:
 python3 crab_multi_dataset.py -p [pset.py] -o [eos/path/to/save/outputs] -t [tag:str] -i [input text file] --send-external -s [job splitting] -n [unit per job] --work-area [crab directory] --dryrun
 ```
 The user can also set the run number by `-r [run number]` option. Also, if the user is giving private input files list, `--private` option can handle the situation. The format of input files is shown in the example directory under test.
+
+**Caveat** When the user chooses to use `--private` option, the job splitting must be set to ``FileBased''!! Also, please check the crab whitelist where to run jobs.
