@@ -122,6 +122,7 @@ for i in range(0, nJobs):
     tmp_job.write("mkdir Job_%s\n"%str(i))
     tmp_job.write("cd Job_%s\n"%str(i))
     tmp_job.write("cd %s\n"%(cmsEnv))
+    tmp_job.write("source /cvmfs/cms.cern.ch/cmsset_default.sh\n")
     tmp_job.write("eval `scramv1 runtime -sh`\n")
     tmp_job.write("cd -\n")
     tmp_job.write("cp -f %s* .\n"%(jobDir))
@@ -155,6 +156,7 @@ else:
 condor_str += "output = $Fp(filename)hlt.stdout\n"
 condor_str += "error = $Fp(filename)hlt.stderr\n"
 condor_str += "log = $Fp(filename)hlt.log\n"
+condor_str += "MY.WantOS = \"el8\"\n"
 condor_str += '+JobFlavour = "%s"\n'%opts.jobFlavour
 condor_str += "queue filename matching ("+MYDIR+"/Jobs/%s/Job_*/*.sh)"%opts.listPath
 condor_name = MYDIR+"/condor_cluster.sub"
