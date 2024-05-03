@@ -78,12 +78,12 @@ def createConfig(args, dataset):
         config.JobType.numCores = args.num_cores
         config.JobType.maxMemoryMB = args.max_memory
         config.JobType.allowUndistributedCMSSW = True
-        config.JobType.inputFiles = ['dummy.txt']
-        config.JobType.pyCfgParams = ['inputFiles=dummy.txt', 'maxEvents=-1']
+        #config.JobType.inputFiles = ['dummy.txt']
+        #config.JobType.pyCfgParams = ['inputFiles=dummy.txt', 'maxEvents=-1']
 
         print(dataset)
         config.section_('Data')
-        config.Data.userInputFiles = open(dataset, "r").readlines()
+        config.Data.userInputFiles = open(dataset, "r").read().splitlines()
         config.Data.splitting = 'FileBased'
         config.Data.unitsPerJob = args.units_per_job
         config.Data.publication = False
@@ -108,8 +108,8 @@ def createConfig(args, dataset):
         config.JobType.sendExternalFolder = args.send_external
         config.JobType.numCores = args.num_cores
         config.JobType.maxMemoryMB = args.max_memory
-        config.JobType.inputFiles = ['dummy.txt']
-        config.JobType.pyCfgParams = ['inputFiles=dummy.txt', 'maxEvents=-1']
+        #config.JobType.inputFiles = ['dummy.txt']
+        #config.JobType.pyCfgParams = ['inputFiles=dummy.txt', 'maxEvents=-1']
 
         config.Data.inputDBS = 'global'
         config.Data.inputDataset = dataset
@@ -337,7 +337,7 @@ def main():
                 l = l.strip()
                 if l.startswith('#'):
                     continue
-                dataset = [s for s in l.split() if '/RAW' in s][0]
+                dataset = [s for s in l.split()][0]
                 cfg = createConfig(args, dataset)
                 if args.dryrun:
                     print('-' * 50)
