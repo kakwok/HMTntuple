@@ -33,7 +33,7 @@ configLogger(__name__)
 def parseDatasetName(dataset):
     procname, ver, tier = dataset[1:].split('/')
     ext = ''
-    isMC = tier.endswith('SIM')
+    isMC = "SIM" in tier
     if isMC:
         ver_pieces = ver.split('_')
         keep_idx = 1
@@ -97,8 +97,14 @@ def createConfig(args, dataset):
 
     else:
         procname, vername, ext, isMC = parseDatasetName(dataset)
+        print("procname = ", procname)
+        print("ext = ", ext)
+        print("isMC = ",isMC)
 
-        config.General.requestName = procname + ext
+        if isMC:
+            config.General.requestName = procname 
+        else:
+            config.General.requestName = procname + ext
         config.General.workArea = args.work_area
         config.General.transferOutputs = True
         config.General.transferLogs = False

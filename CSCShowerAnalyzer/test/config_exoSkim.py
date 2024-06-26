@@ -37,13 +37,107 @@ process.ca4CSCrechitClusters= CSCcluster.cscRechitClusterProducer.clone(
     nStationThres = 10, 
 ) 
 
+process.hltca4CSCrechitClusters= CSCcluster.cscRechitClusterProducer.clone(
+    recHitLabel = "hltCsc2DRecHits",
+    nRechitMin  = 50,
+    rParam      = 0.4,
+    nStationThres = 10, 
+) 
+process.hltMuonCSCDigis = cms.EDProducer( "CSCDCCUnpacker",
+    InputObjects = cms.InputTag( "rawDataCollector" ),
+    UseExaminer = cms.bool( True ),
+    ExaminerMask = cms.uint32( 535558134 ),
+    UseSelectiveUnpacking = cms.bool( True ),
+    ErrorMask = cms.uint32( 0 ),
+    UnpackStatusDigis = cms.bool( False ),
+    UseFormatStatus = cms.bool( True ),
+    useRPCs = cms.bool( False ),
+    useGEMs = cms.bool( False ),
+    useCSCShowers = cms.bool( False ),
+    Debug = cms.untracked.bool( False ),
+    PrintEventNumber = cms.untracked.bool( False ),
+    runDQM = cms.untracked.bool( False ),
+    VisualFEDInspect = cms.untracked.bool( False ),
+    VisualFEDShort = cms.untracked.bool( False ),
+    FormatedEventDump = cms.untracked.bool( False ),
+    SuppressZeroLCT = cms.untracked.bool( True ),
+    DisableMappingCheck = cms.untracked.bool( False ),
+    B904Setup = cms.untracked.bool( False ),
+    B904vmecrate = cms.untracked.int32( 1 ),
+    B904dmb = cms.untracked.int32( 3 )
+)
+process.hltCsc2DRecHits = cms.EDProducer( "CSCRecHitDProducer",
+    CSCStripPeakThreshold = cms.double( 10.0 ),
+    CSCStripClusterChargeCut = cms.double( 25.0 ),
+    CSCStripxtalksOffset = cms.double( 0.03 ),
+    UseAverageTime = cms.bool( False ),
+    UseParabolaFit = cms.bool( False ),
+    UseFivePoleFit = cms.bool( True ),
+    CSCWireClusterDeltaT = cms.int32( 1 ),
+    CSCUseCalibrations = cms.bool( True ),
+    CSCUseStaticPedestals = cms.bool( False ),
+    CSCNoOfTimeBinsForDynamicPedestal = cms.int32( 2 ),
+    wireDigiTag = cms.InputTag( 'hltMuonCSCDigis','MuonCSCWireDigi' ),
+    stripDigiTag = cms.InputTag( 'hltMuonCSCDigis','MuonCSCStripDigi' ),
+    #wireDigiTag = cms.InputTag( 'MuonCSCDigis','MuonCSCWireDigi' ),
+    #stripDigiTag = cms.InputTag( 'MuonCSCDigis','MuonCSCStripDigi' ),
+    readBadChannels = cms.bool( False ),
+    readBadChambers = cms.bool( True ),
+    CSCUseTimingCorrections = cms.bool( True ),
+    CSCUseGasGainCorrections = cms.bool( False ),
+    CSCDebug = cms.untracked.bool( False ),
+    CSCstripWireDeltaTime = cms.int32( 8 ),
+    XTasymmetry_ME1a = cms.double( 0.0 ),
+    XTasymmetry_ME1b = cms.double( 0.0 ),
+    XTasymmetry_ME12 = cms.double( 0.0 ),
+    XTasymmetry_ME13 = cms.double( 0.0 ),
+    XTasymmetry_ME21 = cms.double( 0.0 ),
+    XTasymmetry_ME22 = cms.double( 0.0 ),
+    XTasymmetry_ME31 = cms.double( 0.0 ),
+    XTasymmetry_ME32 = cms.double( 0.0 ),
+    XTasymmetry_ME41 = cms.double( 0.0 ),
+    ConstSyst_ME1a = cms.double( 0.022 ),
+    ConstSyst_ME1b = cms.double( 0.007 ),
+    ConstSyst_ME12 = cms.double( 0.0 ),
+    ConstSyst_ME13 = cms.double( 0.0 ),
+    ConstSyst_ME21 = cms.double( 0.0 ),
+    ConstSyst_ME22 = cms.double( 0.0 ),
+    ConstSyst_ME31 = cms.double( 0.0 ),
+    ConstSyst_ME32 = cms.double( 0.0 ),
+    ConstSyst_ME41 = cms.double( 0.0 ),
+    NoiseLevel_ME1a = cms.double( 7.0 ),
+    NoiseLevel_ME1b = cms.double( 8.0 ),
+    NoiseLevel_ME12 = cms.double( 9.0 ),
+    NoiseLevel_ME13 = cms.double( 8.0 ),
+    NoiseLevel_ME21 = cms.double( 9.0 ),
+    NoiseLevel_ME22 = cms.double( 9.0 ),
+    NoiseLevel_ME31 = cms.double( 9.0 ),
+    NoiseLevel_ME32 = cms.double( 9.0 ),
+    NoiseLevel_ME41 = cms.double( 9.0 ),
+    CSCUseReducedWireTimeWindow = cms.bool( False ),
+    CSCWireTimeWindowLow = cms.int32( 0 ),
+    CSCWireTimeWindowHigh = cms.int32( 15 )
+)
 process.MDSsequence = cms.Path(
-                        process.ca4CSCrechitClusters
+                        process.ca4CSCrechitClusters *
+                        process.hltMuonCSCDigis *
+                        process.hltCsc2DRecHits *
+                        process.hltca4CSCrechitClusters
 )
 
 process.cscRechitTable = cms.EDProducer("CSCrechitTableProducer",
-    recHitLabel = cms.InputTag("csc2DRecHits")
+    recHitLabel = cms.InputTag("csc2DRecHits"),
+    name = cms.string("cscRechits")
 ) 
+process.hltcscRechitTable = process.cscRechitTable.clone(
+    recHitLabel = cms.InputTag("hltCsc2DRecHits"),
+    name = cms.string("cschltRechits")
+) 
+
+process.hltmdsClusterTable = process.mdsClusterTable.clone(
+        src = cms.InputTag("hltca4CSCrechitClusters"),
+        name= cms.string("MDSHLTrechitCluster")
+)
 
 # CSC Shower Digi from RAW
 process.load("EventFilter.CSCRawToDigi.cscUnpacker_cfi")
@@ -62,7 +156,7 @@ process.emulShowerDigiTable = cms.EDProducer("CSCshowerDigiTableProducer",
     LCTShower = cms.InputTag("cscTriggerPrimitiveDigis")
 ) 
 
-process.unpack_step = cms.Path(process.muonCSCDigis+process.cscTriggerPrimitiveDigis)
+process.unpack_step = cms.Path(process.muonCSCDigis+process.cscTriggerPrimitiveDigis+process.hltMuonCSCDigis)
 
 # Input source
 process.source = cms.Source("PoolSource",
@@ -160,7 +254,8 @@ process.Flag_trkPOGFilters = cms.Path(process.trkPOGFilters)
 process.Flag_trkPOG_logErrorTooManyClusters = cms.Path(~process.logErrorTooManyClusters)
 process.Flag_trkPOG_manystripclus53X = cms.Path(~process.manystripclus53X)
 process.Flag_trkPOG_toomanystripclus53X = cms.Path(~process.toomanystripclus53X)
-process.nanoAOD_step = cms.Path(process.nanoSequence + process.cscRechitTable + process.dataShowerDigiTable + process.emulShowerDigiTable)
+#process.nanoAOD_step = cms.Path(process.nanoSequence + process.cscRechitTable + process.dataShowerDigiTable + process.emulShowerDigiTable + process.mdsClusterTable)
+process.nanoAOD_step = cms.Path(process.nanoSequence + process.cscRechitTable +process.hltcscRechitTable+ process.mdsClusterTable+ process.hltmdsClusterTable)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
 

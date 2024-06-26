@@ -24,7 +24,7 @@ process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100),
+    input = cms.untracked.int32(10),
     output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 # CSC clusters
@@ -140,7 +140,8 @@ process.Flag_trkPOG_logErrorTooManyClusters = cms.Path(~process.logErrorTooManyC
 process.Flag_trkPOG_manystripclus53X = cms.Path(~process.manystripclus53X)
 process.Flag_trkPOG_toomanystripclus53X = cms.Path(~process.toomanystripclus53X)
 #process.nanoAOD_step = cms.Path(process.nanoSequenceMC)
-process.nanoAOD_step = cms.Path(process.nanoSequenceMC + process.cscRechitTable)
+#process.nanoAOD_step = cms.Path(process.nanoSequenceMC + process.cscRechitTable)
+process.nanoAOD_step = cms.Path(process.nanoSequenceMC + process.mdsClusterTable+process.cscRechitTable)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
 
