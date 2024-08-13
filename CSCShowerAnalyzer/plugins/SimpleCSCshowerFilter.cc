@@ -85,6 +85,7 @@ private:
   bool AsRecofilter;
   bool debug_;
   TTree* hmtTree;
+  TH1D* counters_;
   int passL1;
   int hasCluster;
   int runNum;
@@ -182,6 +183,7 @@ SimpleCSCshowerFilter::SimpleCSCshowerFilter(const edm::ParameterSet& iConfig) :
 {
   edm::Service<TFileService> fs;
   hmtTree = fs->make<TTree>("hmt", "HMT tree");
+  counters_ =      fs->make<TH1D>("nEvents", "nEvents", 1, 0, 1);
   AsL1filter   = iConfig.getParameter<bool>("AsL1filter");
   AsRecofilter = iConfig.getParameter<bool>("AsRecofilter");
   debug_ = iConfig.getParameter<bool>("debug");
@@ -341,6 +343,8 @@ bool SimpleCSCshowerFilter::filter(edm::Event& iEvent, const edm::EventSetup& iS
                lctHMT_sector[nlctHMT] = sect;
                lctHMT_bits[nlctHMT] = dlct->bitsInTime();
                lctHMT_BX[nlctHMT] = dlct->getBX();
+               // this is not available in data, see:
+               // https://github.com/cms-sw/cmssw/blob/76a4f99661419d26c5a5c3054186408892ccd5de/EventFilter/CSCRawToDigi/src/CSCTMBHeader2020_GEM.cc#L172C71-L173C100
                lctHMT_ComparatorNHits[nlctHMT] = dlct->getComparatorNHits();
                lctHMT_WireNHits[nlctHMT] = dlct->getWireNHits();
                nlctHMT++;
@@ -374,11 +378,18 @@ bool SimpleCSCshowerFilter::filter(edm::Event& iEvent, const edm::EventSetup& iS
   hasCluster = int(has_CSCclusters);
   passL1 = int(has_LCTshs);
 
-  hmtTree->Fill();
+  //Always fill nEvents counter;
+  counters_->Fill(0.5);
   if (AsRecofilter) {
+      if (has_CSCclusters){
+            hmtTree->Fill();    //Only fill the tree when there is cluster
+      }
       return has_CSCclusters;
   }
   else {
+      if (has_LCTshs){
+            hmtTree->Fill();    //Only fill the tree when there is L1 pass
+    }
     return has_LCTshs;
   }
   //  if(AsL1filter){
