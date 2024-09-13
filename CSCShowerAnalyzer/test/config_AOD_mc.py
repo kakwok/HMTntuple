@@ -29,6 +29,7 @@ process.maxEvents = cms.untracked.PSet(
 )
 # CSC clusters
 import RecoMuon.MuonRechitClusterProducer.cscRechitClusterProducer_cfi as CSCcluster 
+import RecoMuon.MuonRechitClusterProducer.dtRechitClusterProducer_cfi as DTcluster 
 
 process.ca4CSCrechitClusters= CSCcluster.cscRechitClusterProducer.clone(
     recHitLabel = "csc2DRecHits",
@@ -36,15 +37,54 @@ process.ca4CSCrechitClusters= CSCcluster.cscRechitClusterProducer.clone(
     rParam      = 0.4,
     nStationThres = 10, 
 ) 
+process.ca4DTrechitClusters= DTcluster.dtRechitClusterProducer.clone(
+    recHitLabel = "dt1DRecHits",
+    nRechitMin  = 50,
+    rParam      = 0.4,
+    nStationThres = 10, 
+) 
 
 process.MDSsequence = cms.Path(
-                        process.ca4CSCrechitClusters
+                        process.ca4CSCrechitClusters+process.ca4DTrechitClusters
 )
 
 
 process.cscRechitTable = cms.EDProducer("CSCrechitTableProducer",
     recHitLabel = cms.InputTag("csc2DRecHits")
-) 
+)
+
+from PhysicsTools.NanoAOD.simpleCandidateFlatTableProducer_cfi import simpleCandidateFlatTableProducer
+from PhysicsTools.NanoAOD.common_cff import *
+process.cscMDSClusterTable = cms.EDProducer("SimpleMuonRecHitClusterFlatTableProducer",
+    src  = cms.InputTag("ca4CSCrechitClusters"),
+    name = cms.string("cscMDSHLTCluster"),
+    doc  = cms.string("MDS cluster at HLT"),
+    variables = cms.PSet(
+        eta = Var("eta", float, doc="cluster eta"),
+        phi = Var("phi", float, doc="cluster phi"),
+        x   = Var("x"  , float, doc="cluster x"),
+        y   = Var("y"  , float, doc="cluster y"),
+        z   = Var("z"  , float, doc="cluster z"),
+        r   = Var("r"  , float, doc="cluster r"),
+        size   = Var("size"  , int, doc="cluster size"),
+        nStation   = Var("nStation"  , int, doc="cluster nStation"),
+        avgStation   = Var("avgStation"  , float, doc="cluster avgStation"),
+        nMB1   = Var("nMB1"  , int, doc="cluster nMB1"),
+        nMB2   = Var("nMB2"  , int, doc="cluster nMB2"),
+        nME11   = Var("nME11"  , int, doc="cluster nME11"),
+        nME12   = Var("nME12"  , int, doc="cluster nME12"),
+        nME41   = Var("nME41"  , int, doc="cluster nME41"),
+        nME42   = Var("nME42"  , int, doc="cluster nME42"),
+        time   = Var("time"  , float, doc="cluster time = avg cathode and anode time"),
+        timeSpread   = Var("timeSpread"  , float, doc="cluster timeSpread")
+    )
+)
+process.dtMDSClusterTable = process.cscMDSClusterTable.clone(
+    src = cms.InputTag("ca4DTrechitClusters"),
+    name= cms.string("dtMDSHLTCluster")
+)
+
+ 
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring('file:/eos/cms/store/user/kakwok/HLT/Commissioning2024/mds_nano/ggH_Hto2Sto4B_AODSIM.root'),
@@ -141,7 +181,7 @@ process.Flag_trkPOG_manystripclus53X = cms.Path(~process.manystripclus53X)
 process.Flag_trkPOG_toomanystripclus53X = cms.Path(~process.toomanystripclus53X)
 #process.nanoAOD_step = cms.Path(process.nanoSequenceMC)
 #process.nanoAOD_step = cms.Path(process.nanoSequenceMC + process.cscRechitTable)
-process.nanoAOD_step = cms.Path(process.nanoSequenceMC + process.mdsClusterTable+process.cscRechitTable)
+process.nanoAOD_step = cms.Path(process.nanoSequenceMC + process.cscMDSClusterTable+process.dtMDSClusterTable+process.cscRechitTable)
 process.endjob_step = cms.EndPath(process.endOfProcess)
 process.NANOAODoutput_step = cms.EndPath(process.NANOAODoutput)
 

@@ -43,6 +43,34 @@ process.MDSsequence = cms.Path(
 process.cscRechitTable = cms.EDProducer("CSCrechitTableProducer",
     recHitLabel = cms.InputTag("csc2DRecHits")
 ) 
+
+from PhysicsTools.NanoAOD.simpleCandidateFlatTableProducer_cfi import simpleCandidateFlatTableProducer
+from PhysicsTools.NanoAOD.common_cff import *
+process.mdsClusterTable = cms.EDProducer("SimpleMuonRecHitClusterFlatTableProducer",
+    src  = cms.InputTag("ca4CSCrechitClusters"),
+    name = cms.string("MDSHLTCluster"),
+    doc  = cms.string("MDS cluster at HLT"),
+    variables = cms.PSet(
+        eta = Var("eta", float, doc="cluster eta"),
+        phi = Var("phi", float, doc="cluster phi"),
+        x   = Var("x"  , float, doc="cluster x"),
+        y   = Var("y"  , float, doc="cluster y"),
+        z   = Var("z"  , float, doc="cluster z"),
+        r   = Var("r"  , float, doc="cluster r"),
+        size   = Var("size"  , int, doc="cluster size"),
+        nStation   = Var("nStation"  , int, doc="cluster nStation"),
+        avgStation   = Var("avgStation"  , float, doc="cluster avgStation"),
+        nMB1   = Var("nMB1"  , int, doc="cluster nMB1"),
+        nMB2   = Var("nMB2"  , int, doc="cluster nMB2"),
+        nME11   = Var("nME11"  , int, doc="cluster nME11"),
+        nME12   = Var("nME12"  , int, doc="cluster nME12"),
+        nME41   = Var("nME41"  , int, doc="cluster nME41"),
+        nME42   = Var("nME42"  , int, doc="cluster nME42"),
+        time   = Var("time"  , float, doc="cluster time = avg cathode and anode time"),
+        timeSpread   = Var("timeSpread"  , float, doc="cluster timeSpread")
+    )
+)
+
 process.simpleCSCshowerFilter = cms.EDFilter("SimpleCSCshowerFilter",
     ca4CSCrechitClusters = cms.InputTag("ca4CSCrechitClusters"),
     hltresults = cms.InputTag( "TriggerResults", "", "HLT" ),
@@ -52,7 +80,8 @@ process.simpleCSCshowerFilter = cms.EDFilter("SimpleCSCshowerFilter",
 process.filter_step = cms.Path(process.simpleCSCshowerFilter)
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/eos/cms/store/user/kakwok/HLT/Commissioning2024/mds_nano/Muon0_AOD_Run2023C_0.root'),
+    #fileNames = cms.untracked.vstring('file:/eos/cms/store/user/kakwok/HLT/Commissioning2024/mds_nano/Muon0_AOD_Run2023C_0.root'),
+    fileNames = cms.untracked.vstring('root://cmsxrootd-site.fnal.gov//store/data/Run2024F/Muon1/AOD/PromptReco-v1/000/382/913/00000/d3e54532-1b52-4e5b-813b-668fa68cdee2.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
