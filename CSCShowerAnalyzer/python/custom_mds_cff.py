@@ -35,7 +35,18 @@ dtMDSClusterTable = cscMDSClusterTable.clone(
     name= cms.string("dtMDSHLTCluster")
 )
 
-def add_mdsTables(process):
+from HMTntuple.CSCShowerAnalyzer.cscShowerDigiTable_cfi import cscShowerDigiTable
+
+dataCSCdigiTable = cscShowerDigiTable.clone(
+    LCTShower = cms.InputTag("muonCSCDigis","MuonCSCShowerDigi"),
+    name = cms.string("lct")
+)
+emulCSCdigiTable = cscShowerDigiTable.clone(
+    LCTShower =  cms.InputTag("cscTriggerPrimitiveDigis"),
+    name = cms.string("elct")
+)
+
+def add_mdsTables(process, MDSshowerDigi=False):
 
     process.ca4CSCrechitClusters = cscRechitClusterProducer    
     process.ca4DTrechitClusters = dtRechitClusterProducer
@@ -46,6 +57,21 @@ def add_mdsTables(process):
     process.MDSTask.add(process.ca4DTrechitClusters)
     process.MDSTask.add(process.cscMDSClusterTable)
     process.MDSTask.add(process.dtMDSClusterTable)
+
+    if MDSshowerDigi:
+        process.load("CalibMuon.CSCCalibration.CSCL1TPLookupTableEP_cff")
+        process.load("L1Trigger.CSCTriggerPrimitives.cscTriggerPrimitiveDigis_cfi")
+        process.cscTriggerPrimitiveDigis.CSCComparatorDigiProducer = "muonCSCDigis:MuonCSCComparatorDigi"
+        process.cscTriggerPrimitiveDigis.CSCWireDigiProducer = "muonCSCDigis:MuonCSCWireDigi"
+        process.cscTriggerPrimitiveDigis.commonParam.runME11ILT = False
+        process.cscTriggerPrimitiveDigis.commonParam.runME21ILT = False
+
+        process.dataCSCdigiTable = dataCSCdigiTable 
+        process.emulCSCdigiTable = emulCSCdigiTable 
+
+        process.MDSTask.add(process.cscTriggerPrimitiveDigis)
+        process.MDSTask.add(process.dataCSCdigiTable)
+        process.MDSTask.add(process.emulCSCdigiTable)
 
     process.nanoTableTaskCommon.add(process.MDSTask)
 
