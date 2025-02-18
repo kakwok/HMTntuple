@@ -56,9 +56,8 @@ void CSCrechitTableProducer::produce(edm::StreamID, edm::Event& iEvent, const ed
 
   std::vector<CSCDetId> unique_ids;
 
-  std::vector<float> cscRechitsX,cscRechitsY,cscRechitsZ,cscRechitsPhi,cscRechitsEta,cscRechitsE;
-  std::vector<float> cscRechitsTpeak,cscRechitsTwire,cscRechitsQuality,cscRechitsChamber,cscRechitsIChamber,cscRechitsStation;
-  std::vector<float> cscRechitsNStrips,cscRechitsHitWire,cscRechitsWGroupsBX,cscRechitsNWireGroups;
+  std::vector<float> cscRechitsX,cscRechitsY,cscRechitsZ,cscRechitsPhi,cscRechitsEta,cscRechitsE,cscRechitsTpeak,cscRechitsTwire;
+  std::vector<int> cscRechitsNStrips,cscRechitsHitWire,cscRechitsWGroupsBX,cscRechitsNWireGroups,cscRechitsQuality,cscRechitsChamber,cscRechitsIChamber,cscRechitsStation;;
 
 
   for (auto const& rechit : rechits) {
