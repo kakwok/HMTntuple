@@ -49,6 +49,8 @@ emulCSCdigiTable = cscShowerDigiTable.clone(
 from HMTntuple.CSCShowerAnalyzer.cscRechitsTable_cfi import cscRechitsTable 
 from HMTntuple.CSCShowerAnalyzer.dtRechitsTable_cfi import dtRechitsTable 
 from HMTntuple.CSCShowerAnalyzer.rpcRechitsTable_cfi import rpcRechitsTable 
+from HMTntuple.CSCShowerAnalyzer.cscSegmentsTable_cfi import cscSegmentsTable 
+from HMTntuple.CSCShowerAnalyzer.dtSegmentsTable_cfi import dtSegmentsTable 
 
 cscRechitsTable = cscRechitsTable.clone( 
     recHitLabel = cms.InputTag("csc2DRecHits")
@@ -59,6 +61,14 @@ dtRechitsTable = dtRechitsTable.clone(
 rpcRechitsTable = rpcRechitsTable.clone( 
     recHitLabel = cms.InputTag("rpcRecHits")
 )
+cscSegmentsTable = cscSegmentsTable.clone( 
+    segmentLabel = cms.InputTag("cscSegments")
+)
+dtSegmentsTable = dtSegmentsTable.clone( 
+    segmentLabel = cms.InputTag("dt4DSegments")
+)
+
+
 def add_mdsTables(process, MDSshowerDigi=False,saveRechits=False):
 
     process.ca4CSCrechitClusters = cscRechitClusterProducer    
@@ -90,9 +100,13 @@ def add_mdsTables(process, MDSshowerDigi=False,saveRechits=False):
         process.cscRechitsTable = cscRechitsTable
         process.dtRechitsTable = dtRechitsTable
         process.rpcRechitsTable = rpcRechitsTable
+        process.cscSegmentsTable = cscSegmentsTable 
+        process.dtSegmentsTable = dtSegmentsTable 
         process.MDSTask.add(process.cscRechitsTable)
         process.MDSTask.add(process.dtRechitsTable)
         process.MDSTask.add(process.rpcRechitsTable)
+        process.MDSTask.add(process.cscSegmentsTable)
+        process.MDSTask.add(process.dtSegmentsTable)
 
 
     process.nanoTableTaskCommon.add(process.MDSTask)
