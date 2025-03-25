@@ -80,7 +80,7 @@ private:
   const edm::EDGetTokenT<CSCShowerDigiCollection> emulLCTShower_token_;
   const edm::EDGetTokenT<reco::MuonRecHitClusterCollection> ca4CSCrechitClusters_token_;
   const edm::EDGetTokenT<reco::MuonCollection> muons_token_;
-  const edm::EDGetTokenT<edm::TriggerResults> triggerBitsToken_; 
+  //const edm::EDGetTokenT<edm::TriggerResults> triggerBitsToken_; 
   bool AsL1filter;
   bool AsRecofilter;
   bool debug_;
@@ -147,15 +147,15 @@ private:
   int   cscRechitsIChamber[CSCRECHITARRAYSIZE];
   int   cscRechitsStation[CSCRECHITARRAYSIZE];
 
-  int nMuons;
-  float muonE[CSCRECHITARRAYSIZE];
-  float muonPt[CSCRECHITARRAYSIZE];
-  float muonEta[CSCRECHITARRAYSIZE];
-  float muonPhi[CSCRECHITARRAYSIZE];
-  int muonCharge[CSCRECHITARRAYSIZE];//muon charge
-  bool muonIsLoose[CSCRECHITARRAYSIZE];
-  bool muonIsMedium[CSCRECHITARRAYSIZE];
-  bool  muonIsGlobal[CSCRECHITARRAYSIZE];
+  //int nMuons;
+  //float muonE[CSCRECHITARRAYSIZE];
+  //float muonPt[CSCRECHITARRAYSIZE];
+  //float muonEta[CSCRECHITARRAYSIZE];
+  //float muonPhi[CSCRECHITARRAYSIZE];
+  //int muonCharge[CSCRECHITARRAYSIZE];//muon charge
+  //bool muonIsLoose[CSCRECHITARRAYSIZE];
+  //bool muonIsMedium[CSCRECHITARRAYSIZE];
+  //bool  muonIsGlobal[CSCRECHITARRAYSIZE];
  
 };
 
@@ -177,8 +177,8 @@ SimpleCSCshowerTreeMaker::SimpleCSCshowerTreeMaker(const edm::ParameterSet& iCon
   inputToken_(consumes<CSCRecHit2DCollection>(iConfig.getParameter<edm::InputTag>("recHitLabel"))),
   dataLCTShower_token_(consumes(iConfig.getParameter<edm::InputTag>("dataLCTShower"))),
   emulLCTShower_token_(consumes(iConfig.getParameter<edm::InputTag>("emulLCTShower"))),
-  ca4CSCrechitClusters_token_(consumes(iConfig.getParameter<edm::InputTag>("ca4CSCrechitClusters"))),
-  triggerBitsToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("hltresults"))) 
+  ca4CSCrechitClusters_token_(consumes(iConfig.getParameter<edm::InputTag>("ca4CSCrechitClusters")))
+  //triggerBitsToken_(consumes<edm::TriggerResults>(iConfig.getParameter<edm::InputTag>("hltresults"))) 
 {
   edm::Service<TFileService> fs;
   hmtTree = fs->make<TTree>("hmt", "HMT tree");
@@ -204,7 +204,7 @@ bool SimpleCSCshowerTreeMaker::filter(edm::Event& iEvent, const edm::EventSetup&
   edm::Handle<CSCShowerDigiCollection> emulLCTshs;
   edm::Handle<reco::MuonRecHitClusterCollection> ca4CSCrechitClusters;
   //edm::Handle<reco::MuonCollection> muons;
-  edm::Handle<edm::TriggerResults> triggerBits;
+  //edm::Handle<edm::TriggerResults> triggerBits;
 
   auto const& geo = iSetup.getData(geometryToken_);
   auto const& rechits = iEvent.get(inputToken_);
@@ -219,15 +219,15 @@ bool SimpleCSCshowerTreeMaker::filter(edm::Event& iEvent, const edm::EventSetup&
   lumiNum = iEvent.luminosityBlock();
   eventNum = iEvent.id().event();
 
-  iEvent.getByToken(triggerBitsToken_, triggerBits);
-  const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
+  //iEvent.getByToken(triggerBitsToken_, triggerBits);
+  //const edm::TriggerNames &names = iEvent.triggerNames(*triggerBits);
 
-  for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
-      std::string hltPathNameReq = "HLT_ZeroBias_v";
-      if ((names.triggerName(i)).find(hltPathNameReq) == std::string::npos) continue;
-      if ((names.triggerName(i)).find_last_of("_") == std::string::npos) continue;
-      isHLT_PPZeroBias = triggerBits->accept(i);
-  }
+  //for (unsigned int i = 0, n = triggerBits->size(); i < n; ++i) {
+  //    std::string hltPathNameReq = "HLT_ZeroBias_v";
+  //    if ((names.triggerName(i)).find(hltPathNameReq) == std::string::npos) continue;
+  //    if ((names.triggerName(i)).find_last_of("_") == std::string::npos) continue;
+  //    isHLT_PPZeroBias = triggerBits->accept(i);
+  //}
 
   //for(const pat::Muon &mu : *muons) {
   //  muonE[nMuons] = mu.energy();
@@ -335,7 +335,6 @@ bool SimpleCSCshowerTreeMaker::filter(edm::Event& iEvent, const edm::EventSetup&
             auto range_emulLCTshs = emulLCTshs->get(detid);
             for (auto dlct = range_dataLCTshs.first; dlct != range_dataLCTshs.second; dlct++) {
                //if (dlct->isNominalInTime()){   has_LCTshs=true; }
-               if (dlct->isLooseInTime()){   has_LCTshs=true; }
                lctHMT_chamber[nlctHMT] = chamber;
                lctHMT_sr[nlctHMT] = sr;
                lctHMT_sector[nlctHMT] = sect;
@@ -346,6 +345,7 @@ bool SimpleCSCshowerTreeMaker::filter(edm::Event& iEvent, const edm::EventSetup&
                nlctHMT++;
             }
             for (auto elct = range_emulLCTshs.first; elct != range_emulLCTshs.second; elct++) {
+               if (elct->isLooseInTime()){   has_LCTshs=true; }
                elctHMT_chamber[nelctHMT] = chamber;
                elctHMT_sr[nelctHMT] = sr;
                elctHMT_sector[nelctHMT] = sect;
@@ -374,6 +374,7 @@ bool SimpleCSCshowerTreeMaker::filter(edm::Event& iEvent, const edm::EventSetup&
   hasCluster = int(has_CSCclusters);
   passL1 = int(has_LCTshs);
 
+  //Always fills the tree
   hmtTree->Fill();
   if (AsRecofilter) {
       return has_CSCclusters;
@@ -381,18 +382,6 @@ bool SimpleCSCshowerTreeMaker::filter(edm::Event& iEvent, const edm::EventSetup&
   else {
     return has_LCTshs;
   }
-  //  if(AsL1filter){
-  //      if (has_LCTshs){
-  //          hmtTree->Fill();
-  //      }
-  //      return has_LCTshs;
-  //  } else if(AsRecofilter){
-  //      if (has_CSCclusters){
-  //          hmtTree->Fill();
-  //      }
-  //      return has_CSCclusters;
-  //  }else
-  //    return has_LCTshs;
 }
 
 void SimpleCSCshowerTreeMaker::reset(){
@@ -441,18 +430,18 @@ void SimpleCSCshowerTreeMaker::reset(){
     cscRechitsChamber[i] = 0;
     cscRechitsIChamber[i] = 0;
   }
-  nMuons = 0;
-  for(int i = 0; i < CSCRECHITARRAYSIZE; i++)
-  {
-    muonE[i] = 0.0;
-    muonPt[i] = 0.0;
-    muonEta[i] = 0.0;
-    muonPhi[i] = 0.0;
-    muonCharge[i] = -99;
-    muonIsLoose[i] = false;
-    muonIsMedium[i] = false;
-    muonIsGlobal[i] = false;
-  }
+  //nMuons = 0;
+  //for(int i = 0; i < CSCRECHITARRAYSIZE; i++)
+  //{
+  //  muonE[i] = 0.0;
+  //  muonPt[i] = 0.0;
+  //  muonEta[i] = 0.0;
+  //  muonPhi[i] = 0.0;
+  //  muonCharge[i] = -99;
+  //  muonIsLoose[i] = false;
+  //  muonIsMedium[i] = false;
+  //  muonIsGlobal[i] = false;
+  //}
   nca4CSCcluster=0;
   for ( int i = 0; i < HMTARRAYSIZE; i++) {
         ca4CSCclusterSize[i] = 0; 
@@ -515,15 +504,15 @@ SimpleCSCshowerTreeMaker::beginRun(edm::Run const&, edm::EventSetup const&)
   hmtTree->Branch("cscRechitsStation",&cscRechitsStation,"cscRechitsStation[ncscRechits]/I");
 
 
-  hmtTree->Branch("nMuons", &nMuons,"nMuons/I");
-  hmtTree->Branch("muonE", muonE,"muonE[nMuons]/F");
-  hmtTree->Branch("muonPt", muonPt,"muonPt[nMuons]/F");
-  hmtTree->Branch("muonEta", muonEta,"muonEta[nMuons]/F");
-  hmtTree->Branch("muonPhi", muonPhi,"muonPhi[nMuons]/F");
-  hmtTree->Branch("muonCharge", muonCharge, "muonCharge[nMuons]/I");
-  hmtTree->Branch("muonIsLoose", muonIsLoose,"muonIsLoose[nMuons]/O");
-  hmtTree->Branch("muonIsMedium", muonIsMedium,"muonIsMedium[nMuons]/O");
-  hmtTree->Branch("muonIsGlobal", muonIsGlobal,"muonIsGlobal[nMuons]/O");
+  //hmtTree->Branch("nMuons", &nMuons,"nMuons/I");
+  //hmtTree->Branch("muonE", muonE,"muonE[nMuons]/F");
+  //hmtTree->Branch("muonPt", muonPt,"muonPt[nMuons]/F");
+  //hmtTree->Branch("muonEta", muonEta,"muonEta[nMuons]/F");
+  //hmtTree->Branch("muonPhi", muonPhi,"muonPhi[nMuons]/F");
+  //hmtTree->Branch("muonCharge", muonCharge, "muonCharge[nMuons]/I");
+  //hmtTree->Branch("muonIsLoose", muonIsLoose,"muonIsLoose[nMuons]/O");
+  //hmtTree->Branch("muonIsMedium", muonIsMedium,"muonIsMedium[nMuons]/O");
+  //hmtTree->Branch("muonIsGlobal", muonIsGlobal,"muonIsGlobal[nMuons]/O");
 
   hmtTree->Branch("nca4CSCcluster",&nca4CSCcluster          ,"nca4CSCcluster/I");
   hmtTree->Branch("ca4CSCclusterSize",&ca4CSCclusterSize    ,"ca4CSCclusterSize[nca4CSCcluster]/I");
