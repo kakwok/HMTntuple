@@ -6,6 +6,7 @@
 <use name="DataFormats/MuonDetId"/>
 <use name="FWCore/MessageLogger"/>
 <use name="FWCore/ParameterSet"/>
+<use name="Geometry/DTGeometry"/>
 <use name="Geometry/CSCGeometry"/>
 <use name="Geometry/GEMGeometry"/>
 <use name="L1Trigger/CSCTriggerPrimitives"/>
