@@ -36,6 +36,8 @@ dtMDSClusterTable = cscMDSClusterTable.clone(
 )
 
 from HMTntuple.CSCShowerAnalyzer.cscShowerDigiTable_cfi import cscShowerDigiTable
+from HMTntuple.CSCShowerAnalyzer.cscMDSshowerTable_cfi import cscMDSshowerTable 
+from HMTntuple.CSCShowerAnalyzer.dtMDSshowerTable_cfi import dtMDSshowerTable 
 
 dataCSCdigiTable = cscShowerDigiTable.clone(
     LCTShower = cms.InputTag("muonCSCDigis","MuonCSCShowerDigi"),
@@ -51,6 +53,18 @@ from HMTntuple.CSCShowerAnalyzer.dtRechitsTable_cfi import dtRechitsTable
 from HMTntuple.CSCShowerAnalyzer.rpcRechitsTable_cfi import rpcRechitsTable 
 from HMTntuple.CSCShowerAnalyzer.cscSegmentsTable_cfi import cscSegmentsTable 
 from HMTntuple.CSCShowerAnalyzer.dtSegmentsTable_cfi import dtSegmentsTable 
+
+cscMDSshowerTable = cscMDSshowerTable.clone( 
+    name = cms.string("cscMDSCluster"),
+    recHitLabel = cms.InputTag("csc2DRecHits"),
+    segmentLabel = cms.InputTag("dt4DSegments"),
+    rpcLabel = cms.InputTag("rpcRecHits")
+)
+dtMDSshowerTable = dtMDSshowerTable.clone( 
+    name = cms.string("dtMDSCluster"),
+    recHitLabel = cms.InputTag("dt1DRecHits"),
+    rpcLabel = cms.InputTag("rpcRecHits")
+)
 
 cscRechitsTable = cscRechitsTable.clone( 
     recHitLabel = cms.InputTag("csc2DRecHits")
@@ -71,8 +85,13 @@ dtSegmentsTable = dtSegmentsTable.clone(
 
 def add_mdsTables(process, MDSshowerDigi=False,saveRechits=False):
 
+    # produce the tables for offline clusters 
+    process.cscMDSshowerTable = cscMDSshowerTable    
+    process.dtMDSshowerTable = dtMDSshowerTable   
+    # produce the HLT clusters 
     process.ca4CSCrechitClusters = cscRechitClusterProducer    
     process.ca4DTrechitClusters = dtRechitClusterProducer
+    # produce the tables for HLT clusters 
     process.cscMDSClusterTable = cscMDSClusterTable
     process.dtMDSClusterTable = dtMDSClusterTable 
 
@@ -80,6 +99,8 @@ def add_mdsTables(process, MDSshowerDigi=False,saveRechits=False):
     process.MDSTask.add(process.ca4DTrechitClusters)
     process.MDSTask.add(process.cscMDSClusterTable)
     process.MDSTask.add(process.dtMDSClusterTable)
+    process.MDSTask.add(process.cscMDSshowerTable)
+    process.MDSTask.add(process.dtMDSshowerTable)
 
     if MDSshowerDigi:
         process.load("CalibMuon.CSCCalibration.CSCL1TPLookupTableEP_cff")
@@ -88,7 +109,46 @@ def add_mdsTables(process, MDSshowerDigi=False,saveRechits=False):
         process.cscTriggerPrimitiveDigis.CSCWireDigiProducer = "muonCSCDigis:MuonCSCWireDigi"
         process.cscTriggerPrimitiveDigis.commonParam.runME11ILT = False
         process.cscTriggerPrimitiveDigis.commonParam.runME21ILT = False
-
+        process.cscTriggerPrimitiveDigis.showerParam.cathodeShower.showerThresholds = cms.vuint32(
+            # ME1/1
+            100, 100, 100,
+            # ME1/2
+            10000, 10000, 10000,
+            # ME1/3
+            10000, 10000, 10000,
+            # ME2/1
+            6, 33, 35,
+            # ME2/2
+            10000, 10000, 10000,
+            # ME3/1
+            6, 31, 33,
+            # ME3/2
+            10000, 10000, 10000,
+            # ME4/1
+            6, 34, 36,
+            # ME4/2
+            10000, 10000, 10000
+        ) 
+        process.cscTriggerPrimitiveDigis.showerParam.anodeShower.showerThresholds = cms.vuint32(
+            # ME1/1
+            140, 140, 140,
+            # ME1/2
+            140, 140, 140,
+            # ME1/3
+            7, 14, 18,
+            # ME2/1
+            12, 56, 58,
+            # ME2/2
+            12, 28, 32,
+            # ME3/1
+            12, 55, 57,
+            # ME3/2
+            12, 26, 34,
+            # ME4/1
+            12, 62, 64,
+            # ME4/2
+            12, 27, 31
+        ) 
         process.dataCSCdigiTable = dataCSCdigiTable 
         process.emulCSCdigiTable = emulCSCdigiTable 
 

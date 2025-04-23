@@ -213,10 +213,10 @@ void dtMDSshowerTableProducer::produce(edm::StreamID, edm::Event& iEvent, const 
           dtRechitsStation.push_back( dtdetid.station());
           dtRechitsWheel.push_back( dtdetid.wheel());
           size++; 
+        
+          //compute for cluster fields
+          station_count_map[dtdetid.station()]++;    
         }
-
-        //compute for cluster fields
-        station_count_map[dtdetid]++;    
     }
     //station statistics
     std::map<int, int>::iterator it;
@@ -337,7 +337,8 @@ void dtMDSshowerTableProducer::produce(edm::StreamID, edm::Event& iEvent, const 
   clsTab->addColumn<float>("z", clsZ, "cluster Z");
   clsTab->addColumn<float>("phi", clsPhi, "cluster Phi");
   clsTab->addColumn<float>("eta", clsEta, "cluster Eta");
-  clsTab->addColumn<int>("BX", clsBX, "cluster BX");
+  clsTab->addColumn<int>("bx", clsBX, "cluster BX");
+  clsTab->addColumn<int>("wheel", clsWheel, "cluster wheel");
   clsTab->addColumn<int>("nStation", clsNstation, "cluster nStation");
   clsTab->addColumn<int>("uniqueChamber", clsUniqueChamber, "cluster unique chambers");
   clsTab->addColumn<float>("avgStation", clsAvgStation, "cluster AvgStation");

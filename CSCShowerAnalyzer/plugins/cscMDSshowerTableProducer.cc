@@ -214,7 +214,7 @@ void cscMDSshowerTableProducer::produce(edm::StreamID, edm::Event& iEvent, const
     
       LocalPoint recHitLocalPosition = rechit->localPosition();
       auto detid = rechit->cscDetId();
-      unique_ids.insert(detid);
+      unique_ids.insert(detid.chamberId());
       auto thischamber = geo.chamber(detid);
       int endcap = CSCDetId::endcap(detid) == 1 ? 1 : -1;
       if (thischamber) {
@@ -331,10 +331,11 @@ void cscMDSshowerTableProducer::produce(edm::StreamID, edm::Event& iEvent, const
     cls_nRE12hit.push_back(nRE12hit);
     cls_nRB1hit.push_back(nRB1hit);
 
+    //cluster time weighted with unc. and pruned outliers
     timeWeighted = cscMDSshowerTableProducer::getWeightedTime(rechits);
 
     for (auto& rechit : rechits) {
-      timeSpreadWeighted += (timeWeighted - time_strip) * (timeWeighted - time_strip);
+      timeSpreadWeighted += (timeWeighted - rechit->tpeak()) * (timeWeighted - rechit->tpeak());
     }
     timeSpreadWeighted = std::sqrt(timeSpreadWeighted * invN);
 
